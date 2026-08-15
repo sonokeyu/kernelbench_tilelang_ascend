@@ -1,0 +1,2 @@
+id,operator,variant,shape,block_M,block_N,tilelang_compile_ms,torch_mean_ms,torch_median_ms,tilelang_mean_ms,tilelang_median_ms,speedup_mean_torch_over_tilelang,correct,max_abs,note
+32,HardTanh,fast_controlled_bm16_bn2048,1024x65536,16,2048,11402.137328,1.036421984,1.038670003,0.498128006,0.465110004,2.080633838,true,0.000000000e+00,Controlled activation shape; original 4096x393216 HardTanh remains not trusted due launch failures.

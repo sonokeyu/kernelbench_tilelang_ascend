@@ -1,0 +1,11 @@
+op,variant,B,C,L,kernel_size,stride,padding,dilation,block_L,compile_ms,mean_ms,speedup_vs_torch,correct
+maxpool1d,torch,16,32,4096,8,1,4,1,,,0.151288404,1.000000000,true
+maxpool1d,tilelang_original,16,32,4096,8,1,4,1,,12174.629388,0.684625168,0.220979905,true
+maxpool1d,tilelang_tiled_bl64,16,32,4096,8,1,4,1,64,12298.027122,7.391959839,0.020466616,true
+maxpool1d,tilelang_tiled_bl128,16,32,4096,8,1,4,1,128,12575.086199,5.807644653,0.026049873,true
+maxpool1d,tilelang_tiled_bl256,16,32,4096,8,1,4,1,256,12328.813920,8.348223267,0.018122228,true
+avgpool1d,torch,16,32,4096,8,1,4,1,,,0.089653196,1.000000000,true
+avgpool1d,tilelang_original,16,32,4096,8,1,4,1,,12014.448373,0.697631989,0.128510730,true
+avgpool1d,tilelang_tiled_bl64,16,32,4096,8,1,4,1,64,12261.865076,7.303623047,0.012275168,true
+avgpool1d,tilelang_tiled_bl128,16,32,4096,8,1,4,1,128,12322.378492,5.639950562,0.015896096,true
+avgpool1d,tilelang_tiled_bl256,16,32,4096,8,1,4,1,256,12266.286824,7.959442139,0.011263754,true

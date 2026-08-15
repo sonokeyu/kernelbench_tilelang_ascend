@@ -1,0 +1,7 @@
+op,variant,B,K,N,block_B,block_K,block_N,compile_ms,mean_ms,speedup_vs_torch,correct
+sum,torch,128,256,4096,,,,,0.415014000,1.000000000,true
+sum,tilelang_original,128,256,4096,8,,512,12308.954222,0.679821167,0.610475255,true
+sum,tilelang_kparallel_bk64,128,256,4096,8,64,512,25545.899276,0.764364395,0.542953077,true
+mean,torch,128,256,4096,,,,,0.444739189,1.000000000,true
+mean,tilelang_original,128,256,4096,8,,512,12131.266721,0.675006790,0.658866245,true
+mean,tilelang_kparallel_bk64,128,256,4096,8,64,512,12051.883211,0.747338409,0.595097460,true

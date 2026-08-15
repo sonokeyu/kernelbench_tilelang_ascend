@@ -1,0 +1,4 @@
+id,operator,shape,variant,block_M,block_N,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,tilelang_passed
+81,Epilogue_Swish_Divide_Clamp_Tanh_Clamp,"1024,8192",torch_epilogue,,,0.271073008,,,1.000000000,True
+81,Epilogue_Swish_Divide_Clamp_Tanh_Clamp,"1024,8192",tilelang_native_tanh,16,1024,0.271073008,0.386904001,13552.316224,0.700620843,True
+81,Epilogue_Swish_Divide_Clamp_Tanh_Clamp,"1024,8192",tilelang_native_tanh_inplace,16,1024,0.271073008,0.375278997,13405.924607,0.722323950,True

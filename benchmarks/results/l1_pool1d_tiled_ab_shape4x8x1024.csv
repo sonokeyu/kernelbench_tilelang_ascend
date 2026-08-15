@@ -1,0 +1,13 @@
+op,variant,B,C,L,kernel_size,stride,padding,dilation,block_L,compile_ms,mean_ms,speedup_vs_torch,correct
+maxpool1d,torch,4,8,1024,8,1,4,1,,,0.149876003,1.000000000,true
+maxpool1d,tilelang_original,4,8,1024,8,1,4,1,,12695.143808,8.399605713,0.017843219,true
+maxpool1d,tilelang_tiled_bl32,4,8,1024,8,1,4,1,32,12416.150017,0.384639206,0.389653475,true
+maxpool1d,tilelang_tiled_bl64,4,8,1024,8,1,4,1,64,12642.830832,0.381214790,0.393153695,true
+maxpool1d,tilelang_tiled_bl128,4,8,1024,8,1,4,1,128,12494.224716,0.388789597,0.385493862,true
+maxpool1d,tilelang_tiled_bl256,4,8,1024,8,1,4,1,256,12323.916266,0.712322388,0.210404735,true
+avgpool1d,torch,4,8,1024,8,1,4,1,,,0.045598001,1.000000000,true
+avgpool1d,tilelang_original,4,8,1024,8,1,4,1,,12140.771993,8.366520996,0.005450055,true
+avgpool1d,tilelang_tiled_bl32,4,8,1024,8,1,4,1,32,12298.731375,0.393171196,0.115974929,true
+avgpool1d,tilelang_tiled_bl64,4,8,1024,8,1,4,1,64,12250.275072,0.380077209,0.119970365,true
+avgpool1d,tilelang_tiled_bl128,4,8,1024,8,1,4,1,128,12455.075283,0.398400803,0.114452584,true
+avgpool1d,tilelang_tiled_bl256,4,8,1024,8,1,4,1,256,12434.375037,0.678478394,0.067206269,true

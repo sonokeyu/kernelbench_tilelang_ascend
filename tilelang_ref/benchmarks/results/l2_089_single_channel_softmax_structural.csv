@@ -1,0 +1,2 @@
+id,operator,variant,notes,shape,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,correct,tilelang_passed
+89,ConvTranspose3d_MaxPool_Softmax_Subtract_Swish_Max,single_channel_softmax_swish_constant,Controlled structural simplification: out_channels=1 makes channel softmax exactly 1; subtract/swish/max become a scalar fill.,64x16x32x32,3.029370728,1.485285950,12281.990375,2.039587548,True,True

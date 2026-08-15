@@ -1,0 +1,117 @@
+diff --git a/src/op/ascend.cc b/src/op/ascend.cc
+index 674f5914..3d12e82d 100644
+--- a/src/op/ascend.cc
++++ b/src/op/ascend.cc
+@@ -923,6 +923,11 @@ TIR_DEFINE_TL_BUILTIN(ascend_exp)
+     .set_attr<TCallEffectKind>("TCallEffectKind",
+                                Integer(CallEffectKind::kOpaque));
+ 
++TIR_DEFINE_TL_BUILTIN(ascend_tanh)
++    .set_num_inputs(4)
++    .set_attr<TCallEffectKind>("TCallEffectKind",
++                               Integer(CallEffectKind::kOpaque));
++
+ TIR_DEFINE_TL_BUILTIN(ascend_ln).set_num_inputs(3).set_attr<TCallEffectKind>(
+     "TCallEffectKind", Integer(CallEffectKind::kOpaque));
+ 
+diff --git a/src/op/ascend.h b/src/op/ascend.h
+index a0e86a92..8b29d4db 100644
+--- a/src/op/ascend.h
++++ b/src/op/ascend.h
+@@ -88,6 +88,8 @@ TVM_DLL const Op &ascend_compare_scalar();
+ 
+ TVM_DLL const Op &ascend_exp();
+ 
++TVM_DLL const Op &ascend_tanh();
++
+ TVM_DLL const Op &ascend_ln();
+ 
+ TVM_DLL const Op &ascend_abs();
+diff --git a/src/target/codegen_ascend.cc b/src/target/codegen_ascend.cc
+index 0ac25e50..065b42b2 100644
+--- a/src/target/codegen_ascend.cc
++++ b/src/target/codegen_ascend.cc
+@@ -499,6 +499,8 @@ void CodeGenTileLangAscend::VisitExpr_(const CallNode *op, std::ostream &os) {
+     SetDeqScaleCodegen(op, "AscendC::SetDeqScale");
+   } else if (op->op.same_as(tl::ascend_exp())) {
+     UnaryVecOpCodegen(op, "AscendC::Exp");
++  } else if (op->op.same_as(tl::ascend_tanh())) {
++    SigmoidCodegen(op, "AscendC::Tanh");
+   } else if (op->op.same_as(tl::ascend_ln())) {
+     UnaryVecOpCodegen(op, "AscendC::Ln");
+   } else if (op->op.same_as(tl::ascend_abs())) {
+diff --git a/src/transform/allocate_tmp_buffer.cc b/src/transform/allocate_tmp_buffer.cc
+index a377f5fc..a71af6f6 100644
+--- a/src/transform/allocate_tmp_buffer.cc
++++ b/src/transform/allocate_tmp_buffer.cc
+@@ -114,6 +114,7 @@ private:
+           return CallNodeAddReduceOutputTmp(op, tmp_buffer_param_offset, 1);
+         }
+         if (op->op.same_as(tl::ascend_sigmoid()) ||
++            op->op.same_as(tl::ascend_tanh()) ||
+             op->op.same_as(tl::ascend_pow()) ||
+             op->op.same_as(tl::ascend_bitwise_xor()) ||
+             op->op.same_as(tl::ascend_merge_sort()) ||
+@@ -807,6 +808,7 @@ private:
+           shape_size = tmp_shape_size;
+         }
+       } else if (call->op.same_as(tl::ascend_sigmoid()) ||
++                 call->op.same_as(tl::ascend_tanh()) ||
+                  call->op.same_as(tl::ascend_bilinear_interpolation()) ||
+                  call->op.same_as(tl::ascend_bitwise_xor()) ||
+                  call->op.same_as(tl::ascend_reducesum_experiment()) ||
+@@ -819,6 +821,9 @@ private:
+         int64_t tmp_shape_size =
+             Downcast<IntImm>(src_access_ptr->args[3])->value *
+             src_buffer_node->dtype.bytes();
++        if (call->op.same_as(tl::ascend_tanh())) {
++          tmp_shape_size /= 2;
++        }
+         if (tmp_shape_size > shape_size) {
+           shape = {
+               IntImm(DataType::Int(32), tmp_shape_size),
+@@ -975,6 +980,7 @@ private:
+           }
+         }
+       } else if (call->op.same_as(tl::ascend_sigmoid()) ||
++                 call->op.same_as(tl::ascend_tanh()) ||
+                  call->op.same_as(tl::ascend_pow()) ||
+                  call->op.same_as(tl::ascend_round()) ||
+                  call->op.same_as(tl::ascend_broadcast())) {
+diff --git a/src/transform/common/operation_config.h b/src/transform/common/operation_config.h
+index 8cdbc703..eb8809c8 100644
+--- a/src/transform/common/operation_config.h
++++ b/src/transform/common/operation_config.h
+@@ -178,6 +178,8 @@ GetOperationConfig() {
+       {"tl.ascend_compare_scalar",
+        {{{0, "write"}, {1, "read"}, {2, "read"}}, "PIPE_V"}},
+       {"tl.ascend_exp", {{{0, "write"}, {1, "read"}}, "PIPE_V"}},
++      {"tl.ascend_tanh",
++       {{{0, "write"}, {1, "read"}, {2, "read"}}, "PIPE_V"}},
+       {"tl.ascend_ln", {{{0, "write"}, {1, "read"}}, "PIPE_V"}},
+       {"tl.ascend_abs", {{{0, "write"}, {1, "read"}}, "PIPE_V"}},
+       {"tl.ascend_reciprocal", {{{0, "write"}, {1, "read"}}, "PIPE_V"}},
+@@ -332,6 +334,7 @@ const std::unordered_map<const tvm::OpNode *, int64_t> ascendc_tmp_arg_ops = {
+     {tl::ascend_sort().get(), 3},
+     {tl::ascend_topk().get(), 3},
+     {tl::ascend_sigmoid().get(), 2},
++    {tl::ascend_tanh().get(), 2},
+     {tl::ascend_bilinear_interpolation().get(), 10},
+     {tl::ascend_sin().get(), 2},
+     {tl::ascend_cos().get(), 2},
+diff --git a/tilelang/language/ascend_tile.py b/tilelang/language/ascend_tile.py
+index 8ecb6e6a..71eb305e 100644
+--- a/tilelang/language/ascend_tile.py
++++ b/tilelang/language/ascend_tile.py
+@@ -921,6 +921,11 @@ def exp(dst: Buffer | BufferRegion, src0: Buffer | BufferRegion):
+     return unary_op(dst, src0, "exp")
+ 
+ 
++def tanh(dst: Buffer | BufferRegion, src0: Buffer | BufferRegion):
++    """Performs element-wise hyperbolic tangent: dst = tanh(src0)."""
++    return unary_op(dst, src0, "tanh")
++
++
+ def sigmoid(dst: Buffer | BufferRegion, src: Buffer | BufferRegion):
+     if isinstance(dst, BufferRegion):
+         print("test1")

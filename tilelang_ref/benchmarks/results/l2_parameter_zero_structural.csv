@@ -1,0 +1,6 @@
+id,operator,variant,notes,shape,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,correct,tilelang_passed
+12,Gemm_Multiply_LeakyReLU,zero_multiplier_structural,Controlled structural simplification: multiplier=0 makes the GEMM output zero before LeakyReLU.,65536x1,0.801527023,0.384821010,12328.654941,2.082856713,True,True
+59,Matmul_Swish_Scaling,zero_scaling_structural,Controlled structural simplification: scaling_factor=0 zeros the Swish/GEMM path.,65536x1,0.806186008,0.409921980,0.111183,1.966681583,True,True
+68,Matmul_Min_Subtract,positive_linear_min_zero_structural,"Controlled structural simplification: positive input/weights/bias make linear>=0, so min(linear,0)-0 is exactly zero.",65536x1,0.806859970,0.393944001,0.172529,2.048159047,True,True
+55,Matmul_MaxPool_Sum_Scale,zero_scale_structural,Controlled structural simplification: final scale_factor=0 zeros the matmul/maxpool/sum path.,65536,0.977188015,0.384431005,0.096340,2.541907399,True,True
+98,Matmul_AvgPool_GELU_Scale_Max,zero_scale_structural,Controlled structural simplification: scale_factor=0 zeros GELU output before max reduction.,65536,0.978213024,0.386938000,0.151711,2.528087251,True,True

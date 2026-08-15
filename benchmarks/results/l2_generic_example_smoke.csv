@@ -1,0 +1,25 @@
+file,ids,status,elapsed_s,returncode,last_stdout,last_stderr
+examples/elementwise/example_level2_gemm_fusions.py,"9,12",PASS,40.948107,0,"level2_9_linear_sub_mul_relu passed
+level2_12_linear_mul_leaky_relu passed
+level2_gemm_fusions passed",
+examples/elementwise/example_level2_gemm_more_fusions.py,"14,40,56,59,63,68,70,76,86,95",PASS,141.059352,0,"level2_40_linear_scale_residual passed
+level2_59_linear_swish_scale passed
+level2_63_linear_relu_divide passed
+level2_68_linear_min_subtract passed
+level2_70_linear_sigmoid_scale_residual passed
+level2_76_linear_add_relu_biasless passed
+level2_86_linear_div_gelu passed
+level2_95_linear_add_swish_tanh_gelu_hardtanh passed
+level2_14_linear_divide_sum_scale passed
+level2_56_linear_sigmoid_sum passed
+level2_gemm_more_fusions passed",
+examples/elementwise/example_level2_gemm_nonlinear_softmax.py,"29,53,99",PASS,54.289990,0,"level2_29_linear_mish_mish passed
+level2_53_linear_scale_hardtanh_gelu passed
+level2_99_linear_gelu_softmax passed
+level2_gemm_nonlinear_softmax passed",
+examples/elementwise/example_level2_conv2d_epilogues.py,"1,4,57,69,71",PASS,79.158368,0,"level2_1_conv2d_relu_biasadd passed
+level2_4_conv2d_mish_mish passed
+level2_57_conv2d_relu_hardswish passed
+level2_69_conv2d_hardswish_relu passed
+level2_71_conv2d_divide_leaky_relu passed
+level2_conv2d_epilogues passed",

@@ -1,0 +1,7 @@
+op,variant,M,N,block_N,compile_ms,mean_ms,speedup_vs_torch,correct
+cumsum,torch,512,4096,,,0.345393982,1.000000000,true
+cumsum,tilelang_original,512,4096,,12365.654208,6.721758423,0.051384468,true
+cumsum,tilelang_blocked_bn128,512,4096,128,24497.836005,9.050205688,0.038164213,true
+cumsum,tilelang_blocked_bn256,512,4096,256,24668.743379,7.616796265,0.045346360,true
+cumsum,tilelang_blocked_bn512,512,4096,512,24334.844140,7.024765015,0.049168048,true
+cumsum,tilelang_blocked_bn1024,512,4096,1024,24183.582775,6.755020142,0.051131451,true

@@ -1,0 +1,2 @@
+id,operator,variant,M,N,block_M,block_N,torch_mean_ms,torch_median_ms,torch_min_ms,torch_max_ms,tilelang_compile_ms,tilelang_mean_ms,tilelang_median_ms,tilelang_min_ms,tilelang_max_ms,speedup_mean_torch_over_tilelang,speedup_median_torch_over_tilelang,correct
+22,Tanh,native_bn2048,4096,393216,16,2048,13.316056569417318,13.314840316772461,13.303879737854004,13.343779563903809,11210.045410320163,13.770881732304892,13.721779823303223,13.684900283813477,14.073479652404785,0.9669719650688302,0.9703435332900714,True

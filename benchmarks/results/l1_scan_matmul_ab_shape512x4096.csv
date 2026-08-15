@@ -1,0 +1,5 @@
+op,variant,M,N,compile_ms,mean_ms,min_ms,median_ms,max_ms,speedup_vs_torch,correct
+reverse_cumsum,torch,512,4096,,2.998403,2.983680,2.996030,3.019880,1.000000,true
+reverse_cumsum,tilelang_matmul,512,4096,13397.702465,0.532001,0.519960,0.531500,0.564560,5.636082,true
+exclusive_cumsum,torch,512,4096,,0.600683,0.595560,0.597780,0.673880,1.000000,true
+exclusive_cumsum,tilelang_matmul,512,4096,13096.300349,0.522693,0.509700,0.521210,0.545180,1.149208,true

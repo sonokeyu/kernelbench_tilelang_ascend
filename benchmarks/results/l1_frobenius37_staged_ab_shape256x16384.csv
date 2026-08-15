@@ -1,0 +1,5 @@
+op,variant,M,N,partial_block_N,apply_block_M,apply_block_N,compile_ms,mean_ms,speedup_vs_torch,correct
+frobenius_norm,torch,256,16384,,,,,0.066930399,1.000000000,true
+frobenius_norm,tilelang_original,256,16384,1024,1,1024,13757.640839,2.059503174,0.032498323,true
+frobenius_norm,tilelang_staged_bm8_bn1024,256,16384,1024,8,1024,37387.298059,1.146049194,0.058400982,true
+frobenius_norm,tilelang_staged_bm16_bn1024,256,16384,1024,16,1024,12549.423499,1.110334778,0.060279476,true

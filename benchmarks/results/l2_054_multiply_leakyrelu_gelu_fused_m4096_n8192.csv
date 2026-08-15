@@ -1,0 +1,3 @@
+id,operator,shape,variant,block_M,block_N,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,tilelang_passed
+54,Conv2d_Multiply_LeakyReLU_GELU_Epilogue,"4096,8192",tilelang_fused_epilogue,16,512,0.508792801,0.545184402,13845.952440,0.933249005,True
+54,Conv2d_Multiply_LeakyReLU_GELU_Epilogue,"4096,8192",tilelang_fused_epilogue,16,1024,0.508792801,0.409866409,17197.892472,1.241362525,True

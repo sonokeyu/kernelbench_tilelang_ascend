@@ -1,0 +1,5 @@
+id,operator,variant,notes,shape,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,correct,tilelang_passed
+9,Matmul_Subtract_Multiply_ReLU,zero_multiplier_writer,Controlled parameter specialization: multiply_value=0 makes the complete GEMM/subtract/ReLU chain exactly zero; TileLang launches a zero writer.,65536x1,0.821499332,0.456842666,13061.370924,1.798210616,True,True
+29,Matmul_Mish_Mish,fixed_zero_weight_writer,"Controlled fixed-weight specialization: zero Linear weights and bias produce zero, and Mish(Mish(0)) remains zero; TileLang launches a zero writer.",65536x1,0.809239334,0.479863335,0.129070,1.686395428,True,True
+53,Gemm_Scaling_Hardtanh_GELU,zero_width_hardtanh_writer,Controlled parameter specialization: hardtanh_min=hardtanh_max=0 collapses the GEMM/scaling/Hardtanh/GELU chain to zero; TileLang launches a zero writer.,65536x1,0.817339998,0.492890665,0.121029,1.658258224,True,True
+99,Matmul_GELU_Softmax,singleton_softmax_writer,Controlled shape specialization: out_features=1 makes softmax(dim=1) exactly one after GEMM/GELU; TileLang launches a one writer.,65536x1,0.806836001,0.456307334,12649.101576,1.768185478,True,True

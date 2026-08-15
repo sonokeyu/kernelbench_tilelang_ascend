@@ -1,0 +1,3 @@
+id,operator,shape,block_M,block_N,torch_median_ms,tilelang_median_ms,speedup_median,correctness_shape,max_rel,measurement
+38,L1Norm,32768x65535,16,1024,33.484,17.000,1.9696,M=2048,4.624e-7,full-shape performance; correctness on same kernel at M=2048
+39,L2Norm,32768x65535,16,1024,20.173,16.916,1.1926,M=2048,1.658e-7,full-shape performance; correctness on same kernel at M=2048

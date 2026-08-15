@@ -1,0 +1,6 @@
+op,variant,B,C,H,W,block_N,compile_ms,mean_ms,speedup_vs_torch,correct
+layer_norm,torch,8,16,64,128,,,0.065142398,1.000000000,true
+layer_norm,tilelang_original,8,16,64,128,,11260.808064,60.079936523,0.001084262,true
+layer_norm,tilelang_staged_bn256,8,16,64,128,256,55810.177155,11.153433838,0.005840569,true
+layer_norm,tilelang_staged_bn512,8,16,64,128,512,55005.274711,11.037540283,0.005901894,true
+layer_norm,tilelang_staged_bn1024,8,16,64,128,1024,54615.728125,10.987105713,0.005928986,true

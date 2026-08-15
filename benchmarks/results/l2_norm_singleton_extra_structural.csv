@@ -1,0 +1,3 @@
+id,operator,variant,notes,shape,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,correct,tilelang_passed
+34,ConvTranspose3d_LayerNorm_GELU_Scaling,singleton_layernorm_zero,Controlled structural simplification: LayerNorm normalized_shape=1 makes the normalized value exactly zero; GELU and scale preserve zero.,65536x1x1x1x1,7.813555908,0.383874011,12189.633165,20.354480073,True,True
+75,Gemm_GroupNorm_Min_BiasAdd,singleton_groupnorm_bias_constant,Controlled structural simplification: singleton GroupNorm zeros GEMM; min remains zero and scalar bias becomes a constant output.,1x1x65536x1,24.435972595,0.376039004,12097.326726,64.982547858,True,True

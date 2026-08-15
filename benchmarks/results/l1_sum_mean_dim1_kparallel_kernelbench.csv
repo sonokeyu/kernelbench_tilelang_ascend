@@ -1,0 +1,3 @@
+id,operator,shape,variant,block_B,block_K,block_N,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,tilelang_passed,source_file
+47,Sum reduction over dim,"128,4096,4095",tilelang_kparallel_bk256,8,256,2048,7.020819855,6.690038300,22380.239027,1.049443896,True,l1_sum_mean_dim1_kernelbench_probe_b8_bn2048.csv
+48,Mean reduction over dim,"128,4096,4095",tilelang_kparallel_bk256,8,256,2048,7.537332153,6.687950897,11133.990856,1.127001718,True,l1_sum_mean_dim1_kernelbench_probe_b8_bn2048.csv

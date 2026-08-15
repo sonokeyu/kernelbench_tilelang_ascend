@@ -1,0 +1,2 @@
+id,operator,variant,shape,block_N,block_B,torch_mean_ms,torch_median_ms,torch_min_ms,torch_max_ms,tilelang_compile_ms,tilelang_mean_ms,tilelang_median_ms,tilelang_min_ms,tilelang_max_ms,speedup_mean_torch_over_tilelang,speedup_median_torch_over_tilelang,correct
+99,TripletMarginLoss,rowwise_two_stage,32768x8192,8192,256,10.324388726552327,10.320680141448975,10.312060356140137,10.372920036315918,26824.77973215282,4.487934652964274,4.451600074768066,4.444399833679199,4.8699798583984375,2.3004766167290525,2.31842033608257,True

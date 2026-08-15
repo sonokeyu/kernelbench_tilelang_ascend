@@ -1,0 +1,2 @@
+id,operator,M,N,block_M,block_N,torch_mean_ms,torch_median_ms,torch_min_ms,torch_max_ms,tilelang_compile_ms,tilelang_first_ms,tilelang_mean_ms,tilelang_median_ms,tilelang_min_ms,tilelang_max_ms,speedup_mean_torch_over_tilelang,correct,error
+32,HardTanh,4096,393216,16,1024,21.423259735107422,21.423259735107422,21.414480209350586,21.432039260864258,12509.501311928034,2.3915842175483704,0.8304199874401093,0.8304199874401093,0.8180599808692932,0.8427799940109253,25.79810223637288,True,

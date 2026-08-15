@@ -1,0 +1,4 @@
+op,variant,BS,NH,L,D,block_D,compile_ms,mean_ms,speedup_vs_torch,correct
+scaled_dot_product_attention,torch,1,2,16,32,,,0.046471601,1.000000000,true
+scaled_dot_product_attention,tilelang_original,1,2,16,32,,12852.715589,34.865095215,0.001332898,true
+scaled_dot_product_attention,tilelang_rowwise,1,2,16,32,32,13265.509592,0.363810005,0.127735906,true
