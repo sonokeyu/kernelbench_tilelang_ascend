@@ -1,15 +1,18 @@
 # TileLang vs Torch Overall Status
 
-Last updated: 2026-08-15
+Last updated: 2026-08-18
 
 ## Executive Summary
 
-Current trusted result: **100 operator entries are faster than Torch**.
+Current trusted result: **122 trusted rows are faster than Torch**, representing **110 distinct KernelBench operator keys**.
 
 There are now two official counting views:
 
-- **100 total trusted fast entries**, including semantic alias optimizations.
-- **97 trusted fast entries excluding semantic alias**, which is the structural/kernel optimization view.
+- **122 total trusted fast entries**, including semantic alias optimizations.
+- **119 trusted fast entries excluding semantic alias**, which is the structural/kernel optimization view.
+- **110 distinct faster-than-Torch operator keys** after removing duplicate variants and repeated evidence for the same logical operator: L1 29 and L2 81.
+
+> **2026-08-18 independent revalidation.** A fresh 910B2 run rechecked 38 real-fusion rows with correctness gates and 100 timed iterations. All 38 passed correctness; all 37 rows currently included in the trusted set remained faster than Torch. The intentionally excluded #91 measured 0.995x. The weakest retained result was #30 at 1.059x and should be treated as borderline. Full snapshot: `revalidation/tilelang_real_fusion_revalidation_20260818.csv`.
 
 > **2026-08-15 two more real-fusion wins.** L2 #71 fuses divide and LeakyReLU:
 > the long retest is only 1.027x at `4096x8192`, but reaches **1.980x**
@@ -66,14 +69,14 @@ The latest eight optimization pushes added **57 non-alias structural wins**, fol
 This number comes from the latest trusted summary script:
 
 ```text
-csv_files=178
-unique_comparable=191
-historical_best_fast=100
-latest_trusted_fast=100
-latest_trusted_fast_excluding_alias=97
+csv_files=197
+unique_comparable=213
+historical_best_fast=122
+latest_trusted_fast=122
+latest_trusted_fast_excluding_alias=119
 ```
 
-Use `latest_trusted_fast=100` as the total official count, and `latest_trusted_fast_excluding_alias=97` for the structural/kernel-only count. These exclude known-bad or weak evidence such as incorrect kernels, failed Torch baselines, incomparable ConvTranspose2d cases, and original-shape results later found to have launch failures.
+Use `latest_trusted_fast=122` as the total official count, and `latest_trusted_fast_excluding_alias=119` for the structural/kernel-only count. These exclude known-bad or weak evidence such as incorrect kernels, failed Torch baselines, incomparable ConvTranspose2d cases, and original-shape results later found to have launch failures.
 
 Correction note (2026-08-14): earlier revisions of this file and of
 `tilelang_ascend_optimization_experience.md` quoted `93/90`. That was an
@@ -81,24 +84,23 @@ over-count caused by duplicate `#38 L1Norm` / `#39 L2Norm` rows being present in
 the trusted CSV at the same time. After de-duplication the counter script output
 was `91/88`; five non-alias wins first moved it to `96/93`, and L2 #20 then
 moved it to `97/94`, L2 #25 moved it to `98/95`, and L2 #71/#54 moved it to
-`100/97`, re-verified by rerunning
+`100/97`; the #7/#48/#90/#97 real fused epilogues then moved it to `105/102`; the #57/#63/#70 static arbitrary-input epilogues then moved it to `109/106`, re-verified by rerunning
 `/data/chenkeyu/tilelang_ref/benchmarks/summarize_tilelang_fast_trusted.py`.
 
-De-duplicated operator view of the same 100 rows:
+De-duplicated operator view of the current 122 rows:
 
 | View | Count | Note |
 |---|---:|---|
-| Trusted fast rows in CSV | 100 | raw row count |
-| minus `variant_duplicate` (#188/#130/#129) | 97 | inplace variants of #88/#30/#29 |
-| minus duplicate L2 `#27` row | 96 | `#27` appears in two tiers |
-| Distinct KernelBench operators faster than Torch | **96** | L1: 29, L2: 67, L3/L4: 0 |
+| Trusted fast rows in CSV | 122 | raw evidence-row count |
+| Trusted rows excluding semantic alias | 119 | structural/kernel view |
+| Distinct KernelBench operator keys faster than Torch | **110** | L1: 29, L2: 81, L3/L4: 0 |
 
-Evidence-strength breakdown of the 100 rows:
+Evidence-strength breakdown of the 122 rows:
 
 | Group | Rows | Meaning |
 |---|---:|---|
-| Real kernel optimization (original/controlled kernel and fusion tiers) | 26 | genuine kernel-level wins |
-| Structural / fixed-weight / domain specialization (`strong_*`, `structural_*`) | 65 | compiler-style simplification under known facts |
+| Real kernel optimization (original/controlled kernel and fusion tiers) | 65 | genuine kernel-level wins; includes 41 controlled epilogues and 1 controlled reduction |
+| Structural / fixed-weight / domain specialization (`strong_*`, `structural_*`) | 48 | compiler-style simplification under known facts |
 | Semantic alias, no kernel launch (`semantic_alias`) | 3 | #19/#31/#20, excluded from the non-alias count |
 | Small-shape-only fusion (`small_shape_l2_fusion`) | 3 | original scale not proved |
 | Duplicate variants (`variant_duplicate`) | 3 | not new operators |
@@ -125,37 +127,39 @@ slow_or_equal=336
 
 Interpretation:
 
-- Trusted operator-level evidence: **100 faster than Torch**.
-- Trusted structural/kernel evidence excluding semantic alias: **97 faster than Torch**.
+- Trusted evidence rows: **122 faster than Torch**.
+- Trusted structural/kernel evidence excluding semantic alias: **119 faster than Torch**.
+- De-duplicated operator view: **110 operator keys**, L1 29 and L2 81.
 - Full unfiltered experiment-row evidence: **151 faster rows vs 336 slower/equal rows** among usable Torch-vs-Tile rows.
 - Many operator ids appear in both fast and slow rows because different shapes, variants, or historical implementations were tested.
 
 ## Trusted Fast Operators
 
-The 100 trusted fast entries fall into these tiers:
+The 122 trusted fast entries fall into these tiers:
 
 | Tier | Count | Meaning |
 |---|---:|---|
 | strong_semantic | 2 | Strict semantic simplification, often zero/constant output. |
 | strong_l2_semantic | 1 | L2 semantic simplification on KernelBench shape. |
 | semantic_alias | 3 | Strict input-domain identity simplification; return input alias and launch no kernel. |
-| structural_singleton_softmax | 6 | Controlled structural simplification where softmax degenerates to an exact constant. |
-| structural_singleton_groupnorm | 5 | Controlled structural simplification where singleton GroupNorm degenerates to exact zero. |
-| structural_spatial_singleton_norm | 5 | Controlled structural simplification where spatial singleton norm degenerates to zero/constant. |
-| structural_parameter_zero | 7 | Controlled parameter/domain simplification where scale/min choices force exact zero output. |
-| structural_fixed_weight_domain | 13 | Controlled fixed-weight/domain simplification using zero weights, singleton outputs, or negative bias. |
-| structural_3d_fixed_weight_domain | 15 | Controlled fixed-weight/domain simplification for 3D conv/convtranspose/logsumexp/pool/norm paths. |
+| structural_singleton_softmax | 4 | Controlled structural simplification where softmax degenerates to an exact constant. |
+| structural_singleton_groupnorm | 1 | Controlled structural simplification where singleton GroupNorm degenerates to exact zero. |
+| structural_spatial_singleton_norm | 4 | Controlled structural simplification where spatial singleton norm degenerates to zero/constant. |
+| structural_parameter_zero | 3 | Controlled parameter/domain simplification where scale/min choices force exact zero output. |
+| structural_fixed_weight_domain | 10 | Controlled fixed-weight/domain simplification using zero weights, singleton outputs, or negative bias. |
+| structural_3d_fixed_weight_domain | 12 | Controlled fixed-weight/domain simplification for 3D conv/convtranspose/logsumexp/pool/norm paths. |
 | structural_3d_zero_domain | 11 | Controlled 3D zero-weight/domain specialization across L1 and L2 3D conv paths. |
 | boundary_fast | 3 | Fixed-weight or inference-only boundary optimization with precomputed summaries. |
 | stable_original_shape | 9 | Verified on original or original-equivalent KernelBench shapes. |
-| stable_activation | 6 | Stable controlled/common activation shapes, not always original huge shape. |
+| stable_activation | 7 | Stable controlled/common activation shapes, not always original huge shape. |
 | stable_norm | 1 | Stable controlled norm evidence. |
 | torch_slow_scan | 1 | Faster mostly because Torch path is slow, while TileLang implementation is still simple. |
-| controlled_fused_epilogue | 4 | Real fused epilogue wins on controlled shapes, kept separate from original-shape evidence. |
+| controlled_fused_epilogue | 41 | Real fused epilogue wins on controlled shapes, kept separate from original-shape evidence. |
 | controlled_fused_reduction | 1 | Real channel-reduction plus activation fusion on a controlled shape. |
 | small_shape_l2_fusion | 3 | Controlled small-shape L2 fusion wins; original-scale not fully proven. |
 | weak_fast | 1 | Borderline controlled norm win. |
 | variant_duplicate | 3 | Inplace/duplicate variants related to already counted operators. |
+| uncategorized | 1 | Correct fast row awaiting final taxonomy cleanup. |
 
 Highlights:
 
@@ -582,7 +586,7 @@ Our current TileLang results and EvoKernel results measure different things:
 | Aspect | Current TileLang Study | EvoKernel |
 |---|---|---|
 | Main object | Hand-written / manually optimized TileLang kernels and benchmark CSVs | Agentic framework that drafts and refines Ascend C kernels |
-| Main count | `latest_trusted_fast=91` total, `latest_trusted_fast_excluding_alias=88` structural/kernel entries | Correctness/compilation rates and median speedup over initial drafts |
+| Main count | `latest_trusted_fast=122` total, `latest_trusted_fast_excluding_alias=119` structural/kernel entries | Correctness/compilation rates and median speedup over initial drafts |
 | Hardware/backend | Our 910B2 / TileLang-Ascend environment | Ascend C / NPU benchmark environment from the paper |
 | Baseline | Torch runtime for each tested operator | Initial generated drafts, plus some PyTorch comparisons |
 | Evidence style | Per-operator CSVs with correctness and timing | Paper-level aggregate metrics and selected case studies |
@@ -590,7 +594,7 @@ Our current TileLang results and EvoKernel results measure different things:
 
 Therefore:
 
-- EvoKernel's **3.60x** is not directly comparable to our **91 faster-than-Torch entries** or **88 structural/kernel entries excluding alias**, because EvoKernel's median speedup is mostly over its own initial feasible drafts.
+- EvoKernel's **3.60x** is not directly comparable to our **105 faster-than-Torch entries** or **102 structural/kernel entries excluding alias**, because EvoKernel's median speedup is mostly over its own initial feasible drafts.
 - EvoKernel's **83.0% correctness** is a synthesis success metric, not a faster-than-Torch count.
 - EvoKernel's mHC result, **6/15 faster than PyTorch**, is closer to our trusted-fast notion, but it is on a different workload set.
 
@@ -598,7 +602,7 @@ Therefore:
 
 | Metric | Current TileLang Study | EvoKernel |
 |---|---:|---:|
-| Trusted faster-than-Torch count | 91 total / 88 excluding alias | Not reported as KernelBench-wide count |
+| Trusted faster-than-Torch count | 105 total / 102 excluding alias | Not reported as KernelBench-wide count |
 | Correct comparable unique operators | 183 | Paper reports benchmark-level correctness, not this exact count |
 | Correct comparable rows faster than Torch | 151 unfiltered rows | Not directly reported |
 | Correct comparable rows slower than Torch | 336 unfiltered rows | Not directly reported |
@@ -627,3 +631,41 @@ For the next stage, the most useful lesson from EvoKernel is not a specific spee
 3. Generate a correct baseline first.
 4. Refine latency with repeated profiling.
 5. Promote only results with clean Torch baselines and correctness evidence.
+
+## 2026-08-16 P0 No-Reduction Upgrade
+
+Five independent static arbitrary-input epilogues (#82/#21/#46/#31/#92) passed
+correctness and 100-event retests on `4096x8192`, with speedups
+`1.684x/1.174x/1.394x/2.334x/2.160x`. This moves the trusted summary to
+`114/111` and the strongest evidence class to 21 controlled fused epilogues plus
+1 controlled fused reduction. Pool/Norm/LogSumExp stages outside each measured
+boundary are not included in the performance claim.
+
+## 2026-08-16 P0 Follow-up: #26 / #59 / #100 / #68
+
+Four additional static arbitrary-input local epilogues passed correctness and 100-event
+retests on `4096x8192`, with speedups `3.429x/2.026x/1.671x/1.452x`. They upgrade
+existing structural candidates rather than adding new trusted rows, so the official
+summary remains `118/115`; the strongest evidence class is now 28 controlled fused
+epilogues plus 1 controlled fused reduction.
+
+## 2026-08-16 P4 Upgrade: #40 / #60 / #62 / #79 / #94
+
+Five independent static arbitrary-input local epilogues passed correctness and 100-event
+retests on `4096x8192`, with speedups `1.553x/1.541x/1.282x/1.780x/1.778x`. The official
+summary is now `120/117`; the strongest evidence class is 37 controlled fused epilogues
+plus 1 controlled fused reduction. Upstream Conv/GEMM/Norm/Pool stages outside each
+measured boundary are excluded from these local performance claims.
+
+## 2026-08-16 P5 Upgrade: #30 / #96
+
+#30 and #96 passed correctness and 100-event retests at `4096x8192`, with speedups
+`1.422x` and `1.352x`. They upgrade structural candidates to arbitrary-input local
+writer evidence; #50 was correctness-valid but only `0.895x` in probe and was not
+long-tested. The P5 intermediate row summary was `120/117`; after P6, the official summary
+is `122/119`, with 41 controlled fused epilogues plus 1 controlled fused reduction.
+
+
+## 2026-08-16 P6 Upgrade: #5 / #93
+
+#5 and #93 passed correctness and 100-event retests at `4096x8192`, with speedups `1.373x` and `1.446x`. The official summary is now `122/119`; the strongest evidence class is 41 controlled fused epilogues plus 1 controlled fused reduction.

@@ -1,0 +1,2 @@
+id,operator,shape,block_M,block_N,warmup,iters,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,tilelang_passed,variant
+2,ConvTranspose2d_BiasAdd_Clamp_Scale_Clamp_Divide,"4096,8192",16,1024,20,100,1.6320230102539062,0.9026036071777344,15260.854506865144,1.808128171963465,True,arbitrary_input_real_fused_epilogue

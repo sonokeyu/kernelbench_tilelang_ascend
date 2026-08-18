@@ -1,0 +1,6 @@
+id,operator,shape,block_M,block_N,warmup,iters,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,tilelang_passed,variant
+82,Conv2d_Tanh_Scaling_BiasAdd,"4096,8192",16,1024,20,100,0.6156224060058594,0.36549259185791017,227.68593207001686,1.6843635677441866,True,arbitrary_input_real_fused_epilogue
+21,Conv2d_Add_Scale_Sigmoid,"4096,8192",16,1024,20,100,0.4326528167724609,0.3685403823852539,50.24172551929951,1.1739631189729083,True,arbitrary_input_real_fused_epilogue
+46,Conv2d_Subtract_Tanh_Subtract,"4096,8192",16,1024,20,100,0.6786403656005859,0.48668140411376953,40.31679220497608,1.3944242781093459,True,arbitrary_input_real_fused_epilogue
+31,Conv2d_Min_Add_Multiply,"4096,8192",16,1024,20,100,0.8616078186035157,0.36921741485595705,52.589500322937965,2.33360557746079,True,arbitrary_input_real_fused_epilogue
+92,Conv2d_GroupNorm_Tanh_HardSwish_ResidualAdd,"4096,8192",16,1024,20,100,0.8461727905273437,0.39173301696777346,381.2378477305174,2.1600752397058107,True,arbitrary_input_real_fused_epilogue

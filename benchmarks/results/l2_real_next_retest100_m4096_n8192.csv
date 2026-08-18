@@ -1,0 +1,5 @@
+id,operator,shape,block_M,block_N,warmup,iters,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,tilelang_passed,variant
+59,Matmul_Swish_Scaling,"4096,8192",16,1024,20,100,0.713255615234375,0.35212398529052735,210.64262092113495,2.025580889202672,True,arbitrary_input_real_fused_epilogue
+68,Matmul_Min_Subtract,"4096,8192",16,1024,20,100,0.5372438049316406,0.37005680084228515,33.238485455513,1.451787411307728,True,arbitrary_input_real_fused_epilogue
+100,ConvTranspose3d_Clamp_Min_Divide,"4096,8192",16,1024,20,100,0.7038896179199219,0.4212723922729492,34.12555158138275,1.6708657648371612,True,arbitrary_input_real_fused_epilogue
+26,ConvTranspose3d_Add_HardSwish,"4096,8192",16,1024,20,100,1.2292014312744142,0.3584587860107422,53.8580808788538,3.4291290358763247,True,arbitrary_input_real_fused_epilogue

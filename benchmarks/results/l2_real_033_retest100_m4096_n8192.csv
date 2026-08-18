@@ -1,0 +1,2 @@
+id,operator,shape,block_N,warmup,iters,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,tilelang_passed,variant
+33,Gemm_Scale_BatchNorm,"4096,8192",1024,20,100,30.7928759765625,4.150382385253907,15509.476836770773,7.419286494171716,True,arbitrary_input_real_fused_training_bn

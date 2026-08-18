@@ -1,0 +1,3 @@
+id,operator,shape,block_M,block_N,warmup,iters,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,tilelang_passed,variant
+30,Gemm_GroupNorm_Hardtanh,"4096,8192",16,1024,20,100,0.5127956008911133,0.3604991912841797,216.4576854556799,1.4224597815723785,True,arbitrary_input_real_fused_epilogue
+96,ConvTranspose3d_Multiply_Max_GlobalAvgPool_Clamp,"4096,8192",16,1024,20,100,0.515958595275879,0.3816210174560547,32.88852795958519,1.352018289546366,True,arbitrary_input_real_fused_epilogue

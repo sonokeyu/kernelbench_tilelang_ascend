@@ -1,0 +1,4 @@
+id,operator,shape,block_M,block_N,warmup,iters,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,tilelang_passed,variant
+57,Conv2d_ReLU_HardSwish,"4096,8192",16,1024,20,100,1.2345407867431641,0.3685145950317383,12890.075203031301,3.3500458418392887,True,arbitrary_input_real_fused_epilogue
+63,Gemm_ReLU_Divide,"4096,8192",16,1024,20,100,0.4137527847290039,0.36164161682128904,13692.749524489045,1.1440961589701841,True,arbitrary_input_real_fused_epilogue
+70,Gemm_Sigmoid_Scaling_ResidualAdd,"4096,8192",16,1024,20,100,0.7491960144042968,0.3681869888305664,12406.671438366175,2.0348247959111467,True,arbitrary_input_real_fused_epilogue

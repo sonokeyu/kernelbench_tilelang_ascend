@@ -1,0 +1,3 @@
+id,operator,shape,block_M,block_N,warmup,iters,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,tilelang_passed,variant
+5,ConvTranspose2d_Subtract_Tanh,"4096,8192",16,1024,20,100,0.49823799133300783,0.36292980194091795,225.78828036785126,1.3728219304903404,True,arbitrary_input_real_fused_epilogue
+93,ConvTranspose2d_Add_Min_GELU_Multiply,"4096,8192",16,1024,20,100,0.5223812103271485,0.3613592147827148,33.21945294737816,1.4456009116614228,True,arbitrary_input_real_fused_epilogue

@@ -1,0 +1,2 @@
+id,operator,shape,block_M,block_N,warmup,iters,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,tilelang_passed,variant
+9,Matmul_Subtract_Multiply_ReLU,"4096,8192",16,1024,20,100,0.6129290008544922,0.35414859771728513,17271.2116651237,1.7307113590318097,True,arbitrary_input_real_fused_epilogue

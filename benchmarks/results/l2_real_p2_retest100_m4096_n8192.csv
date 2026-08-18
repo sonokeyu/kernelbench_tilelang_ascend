@@ -1,0 +1,4 @@
+id,operator,shape,block_M,block_N,warmup,iters,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,tilelang_passed,variant
+53,Gemm_Scaling_Hardtanh_GELU,"4096,8192",16,1024,20,100,0.7353082275390626,0.3612842178344727,217.39549562335014,2.0352625197593164,True,arbitrary_input_real_fused_epilogue
+13,ConvTranspose3d_Mean_Add_Softmax_Tanh_Scaling,"4096,8192",16,1024,20,100,0.47111019134521487,0.37578941345214845,35.1503100246191,1.2536547717441333,True,arbitrary_input_real_fused_epilogue
+89,ConvTranspose3d_MaxPool_Softmax_Subtract_Swish_Max,"4096,8192",16,1024,20,100,0.9491311645507813,0.3678070068359375,44.416192919015884,2.580514092745783,True,arbitrary_input_real_fused_epilogue

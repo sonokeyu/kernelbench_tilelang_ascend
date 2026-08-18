@@ -14,22 +14,22 @@
 可信性能统计的当前快照：
 
 ```text
-latest_trusted_fast=100
-latest_trusted_fast_excluding_alias=97
-distinct_operators_faster_than_torch=96
+latest_trusted_fast=122
+latest_trusted_fast_excluding_alias=119
+distinct_operators_faster_than_torch=110
 ```
 
-100 条可信加速记录对应 96 个不同 KernelBench 算子，其中 L1 29 个、L2 67 个。按证据类型划分：
+122 条可信加速记录对应 110 个不同 KernelBench 算子，其中 L1 29 个、L2 81 个。按证据类型划分：
 
 | 证据类型 | 记录数 | 说明 |
 |---|---:|---|
-| 真实 kernel 优化 | 26 | 原始或受控 shape 上的分块、归约、片上复用与融合 kernel |
-| 编译器结构/参数/输入域特化 | 65 | 在已知 shape、参数、权重或输入域条件下进行严格化简 |
-| Semantic alias | 3 | 无 kernel launch，单独列示，不计入 97 条非 alias 结果 |
+| 真实 kernel 优化 | 65 | 原始或受控 shape 上的分块、归约、片上复用与融合 kernel；其中 42 条为真实融合证据 |
+| 编译器结构/参数/输入域特化 | 48 | 在已知 shape、参数、权重或输入域条件下进行严格化简 |
+| Semantic alias | 3 | 无 kernel launch，单独列示，不计入 119 条非 alias 结果 |
 | 小 shape 融合 | 3 | 只证明受控小规模性能，不代表原始规模 |
 | 重复优化 variant | 3 | 同一算子的实现变体，不代表新增算子 |
 
-不能把全部 100 条记录概括为“通用 TileLang kernel 在原始 shape 上反超 Torch”。可信 CSV 中的 `tier`、`shape` 和 `reason` 给出了每条结果的适用范围。
+不能把全部 122 条记录概括为“通用 TileLang kernel 在原始 shape 上反超 Torch”。可信 CSV 中的 `tier`、`shape` 和 `reason` 给出了每条结果的适用范围。
 
 ## 代表性真实融合结果
 
@@ -42,6 +42,12 @@ distinct_operators_faster_than_torch=96
 | L2 #54 | Multiply + LeakyReLU + GELU | `4096x8192` | 0.508793 ms | 0.409866 ms | 1.241x |
 | L2 #71 | Divide + LeakyReLU | `8192x8192` | 0.857857 ms | 0.433276 ms | 1.980x |
 | L2 #81 | Swish + Divide + Clamp + Tanh | `4096x8192` | 1.537699 ms | 0.379714 ms | 4.050x |
+| L2 #33 | Scale + training BatchNorm | `4096x8192` | 30.792876 ms | 4.150382 ms | 7.419x |
+| L2 #73 | training BatchNorm + Scaling | `4096x8192` | 28.014446 ms | 3.890315 ms | 7.201x |
+| L2 #88 | Swish + Multiply + Swish | `4096x8192` | 1.948215 ms | 0.370306 ms | 5.261x |
+| L2 #95 | Add + Swish + Tanh + GELU | `4096x8192` | 1.693119 ms | 0.517289 ms | 3.273x |
+
+2026-08-18 在另一张空闲 910B2 上重新验证了 38 条真实融合结果：全部通过正确性，可信集合中的 37 条仍快于 Torch；未计入可信集合的 #91 为 `0.995x`。复测快照见 `benchmarks/results/revalidation/tilelang_real_fusion_revalidation_20260818.csv`。#30 本轮为 `1.059x`，属于需要继续复核的边缘结果。
 
 ## 仓库结构
 
@@ -100,8 +106,8 @@ python3 summarize_tilelang_fast_trusted.py
 当前预期输出：
 
 ```text
-latest_trusted_fast=100
-latest_trusted_fast_excluding_alias=97
+latest_trusted_fast=122
+latest_trusted_fast_excluding_alias=119
 ```
 
 加速比统一定义为：

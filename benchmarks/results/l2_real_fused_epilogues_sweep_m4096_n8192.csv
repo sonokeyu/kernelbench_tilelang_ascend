@@ -1,0 +1,9 @@
+id,operator,stages,shape,variant,block_M,block_N,warmup,iters,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,tilelang_passed,error
+7,Conv3d_ReLU_LeakyReLU_GELU_Sigmoid_BiasAdd_Epilogue,"relu,gelu,sigmoid,bias_add (leaky_relu range-eliminated)","4096,8192",tilelang_real_fused_epilogue,16,512,10,50,0.999973221,0.456824799,12208.058316,2.188964399,True,
+7,Conv3d_ReLU_LeakyReLU_GELU_Sigmoid_BiasAdd_Epilogue,"relu,gelu,sigmoid,bias_add (leaky_relu range-eliminated)","4096,8192",tilelang_real_fused_epilogue,16,1024,10,50,0.999973221,0.389245186,12094.027709,2.569006007,True,
+48,Conv3d_Scaling_Tanh_Multiply_Sigmoid_Epilogue,"scale,tanh,multiply,sigmoid","4096,8192",tilelang_real_fused_epilogue,16,512,10,50,0.720893631,0.451492386,12569.669547,1.596690561,True,
+48,Conv3d_Scaling_Tanh_Multiply_Sigmoid_Epilogue,"scale,tanh,multiply,sigmoid","4096,8192",tilelang_real_fused_epilogue,16,1024,10,50,0.720893631,0.380336800,13344.452145,1.895408574,True,
+90,Conv3d_LeakyReLU_Sum_Clamp_GELU_Epilogue,"leaky_relu,sum_add,clamp,gelu","4096,8192",tilelang_real_fused_epilogue,16,512,10,50,1.111877213,0.413873215,12028.260408,2.686516481,True,
+90,Conv3d_LeakyReLU_Sum_Clamp_GELU_Epilogue,"leaky_relu,sum_add,clamp,gelu","4096,8192",tilelang_real_fused_epilogue,16,1024,10,50,1.111877213,0.386674805,11668.762291,2.875483996,True,
+97,Matmul_BatchNorm_BiasAdd_Divide_Swish_Epilogue,"bn_eval(rsqrt in kernel),bias_add,divide,swish","4096,8192",tilelang_real_fused_epilogue,16,512,10,50,1.227043228,0.471264381,11635.693863,2.603725799,True,
+97,Matmul_BatchNorm_BiasAdd_Divide_Swish_Epilogue,"bn_eval(rsqrt in kernel),bias_add,divide,swish","4096,8192",tilelang_real_fused_epilogue,16,1024,10,50,1.227043228,0.403782005,12589.241387,3.038875463,True,

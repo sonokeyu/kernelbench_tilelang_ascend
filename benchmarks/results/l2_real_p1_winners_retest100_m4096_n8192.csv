@@ -1,0 +1,4 @@
+id,operator,shape,block_M,block_N,warmup,iters,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,tilelang_passed,variant
+16,ConvTranspose2d_Mish_Add_Hardtanh_Scale,"4096,8192",16,1024,20,100,0.9135797882080078,0.4046672058105469,12550.90793594718,2.25760767141511,True,arbitrary_input_real_fused_epilogue
+74,ConvTranspose3d_LeakyReLU_Multiply_LeakyReLU_MaxPool,"4096,8192",16,1024,20,100,0.5510155868530273,0.3590243911743164,12955.19626699388,1.534758084404059,True,arbitrary_input_real_fused_epilogue
+88,Gemm_GroupNorm_Swish_Multiply_Swish,"4096,8192",16,1024,20,100,1.948214569091797,0.3703057861328125,12556.517250835896,5.261096753138655,True,arbitrary_input_real_fused_epilogue

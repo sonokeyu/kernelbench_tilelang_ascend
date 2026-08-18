@@ -1,0 +1,6 @@
+id,operator,shape,block_M,block_N,warmup,iters,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,tilelang_passed,variant
+62,Matmul_GroupNorm_LeakyReLU_Sum,"4096,8192",16,1024,20,100,0.5504209899902344,0.42934700012207033,233.75225439667702,1.2819956581360548,True,arbitrary_input_real_fused_epilogue
+94,Gemm_BiasAdd_Hardtanh_Mish_GroupNorm,"4096,8192",16,1024,20,100,0.668821792602539,0.3761967849731445,55.09014427661896,1.77785089963032,True,arbitrary_input_real_fused_epilogue
+40,Matmul_Scaling_ResidualAdd,"4096,8192",16,1024,20,100,0.5563394165039063,0.3583406066894531,38.19092735648155,1.55254360270156,True,arbitrary_input_real_fused_epilogue
+79,Conv3d_Multiply_InstanceNorm_Clamp_Multiply_Max,"4096,8192",16,1024,20,100,0.656129379272461,0.3685221862792969,42.04151593148708,1.7804338617897792,True,arbitrary_input_real_fused_epilogue
+60,ConvTranspose3d_Swish_GroupNorm_HardSwish,"4096,8192",16,1024,20,100,0.5517177963256836,0.35791400909423826,61.75475753843784,1.5414814237696326,True,arbitrary_input_real_fused_epilogue

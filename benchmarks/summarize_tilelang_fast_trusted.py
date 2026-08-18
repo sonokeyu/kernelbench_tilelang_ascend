@@ -37,6 +37,7 @@ LATEST_TRUSTED_FILES = {
     "l2_025_channel_min_tanh_fused_b128_c64_n8192_large_tiles.csv",
     "l2_071_divide_leakyrelu_fused_m8192_n8192_stable.csv",
     "l2_054_multiply_leakyrelu_gelu_fused_m4096_n8192.csv",
+    "l2_095_epilogue_fused_m4096_n8192_retest100.csv",
     "l2_strict_param_domain_structural.csv",
     "l2_strict_param_domain_extra_structural.csv",
     "l2_3d_fixed_weight_domain_structural.csv",
@@ -48,6 +49,21 @@ LATEST_TRUSTED_FILES = {
     "l1_max_min_dim1_shape_extrapolate_k256.csv",
     "l1_max_min_dim1_shape_extrapolate_k1024.csv",
     "l1_max_min_dim1_shape_extrapolate_k4096_n4095.csv",
+    "l2_real_fused_epilogues_retest100_m4096_n8192.csv",
+    "l2_095_epilogue_fused_m4096_n8192_retest100.csv",
+    "l2_real_validated_epilogues_retest100_m4096_n8192.csv",
+    "l2_real_new_009_retest100_m4096_n8192.csv",
+    "l2_real_002_retest100_m4096_n8192.csv",
+    "l2_real_073_retest100_m4096_n8192.csv",
+    "l2_real_033_retest100_m4096_n8192.csv",
+    "l2_real_p0_retest100_m4096_n8192.csv",
+    "l2_real_p1_winners_retest100_m4096_n8192.csv",
+    "l2_real_next_retest100_m4096_n8192.csv",
+    "l2_real_p2_retest100_m4096_n8192.csv",
+    "l2_real_p3_retest100_m4096_n8192.csv",
+    "l2_real_p4_retest100_m4096_n8192.csv",
+    "l2_real_p5_retest100_m4096_n8192.csv",
+    "l2_real_p6_retest100_m4096_n8192.csv",
 }
 
 TIERS = {
@@ -89,6 +105,7 @@ TIERS = {
     "25|Conv2d_ChannelMin_Tanh_Tanh_Epilogue": ("controlled_fused_reduction", "Controlled B=128,C=64,N=8192 materialized Conv2d output: channel-min reduction and two tanh activations fused into one kernel; arbitrary input, no alias."),
     "71|Conv2d_Divide_LeakyReLU_Epilogue": ("controlled_fused_epilogue", "Controlled 8192x8192 materialized Conv2d output: divide-by-two and LeakyReLU fused in-place in one UB tile; arbitrary input, no alias. The 4096x8192 long retest is only 1.027x."),
     "54|Conv2d_Multiply_LeakyReLU_GELU_Epilogue": ("controlled_fused_epilogue", "Controlled 4096x8192 materialized Conv2d output: per-channel multiply, LeakyReLU, and GELU approximation fused into one kernel; arbitrary input, no alias."),
+    "95|Matmul_Add_Swish_Tanh_GELU_Hardtanh_Epilogue": ("controlled_fused_epilogue", "Controlled 4096x8192 materialized Linear output: Add, Swish, Tanh, and GELU are fused into one writer kernel for arbitrary input and add vector; the final Hardtanh is eliminated by its provable input range, with no alias or fixed-weight specialization."),
     "33|Gemm_Scale_BatchNorm": ("structural_fixed_weight_domain", "Controlled fixed-weight simplification: scale=0 and eval BatchNorm default params keep output exactly zero."),
     "41": ("structural_fixed_weight_domain", "Controlled fixed-weight simplification: zero GEMM weights/bias and eval BatchNorm make GELU/ReLU output exactly zero."),
     "56": ("structural_fixed_weight_domain", "Controlled fixed-weight simplification: zero Linear output gives sigmoid(0)=0.5 and one-feature sum is 0.5."),
@@ -152,9 +169,159 @@ TIERS = {
     "129": ("variant_duplicate", "Softplus inplace variant; related to #29."),
     "130": ("variant_duplicate", "Softsign inplace variant; related to #30."),
     "188": ("variant_duplicate", "NewGELU inplace variant; related to #88."),
+    # Real fused epilogue kernels: arbitrary input, no zero-weight/constant/alias
+    # shortcut. These are evidence upgrades for operators that previously only had
+    # compiler-specialization evidence. They measure the materialized epilogue
+    # stage, not the full end-to-end operator.
+    "7|Conv3d_ReLU_LeakyReLU_GELU_Sigmoid_BiasAdd_Epilogue": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized Conv3d output: relu/gelu/sigmoid/per-channel bias fused into one writer kernel for arbitrary input; LeakyReLU(0.01) after ReLU is eliminated by range analysis valid on the whole input domain. No alias or fixed-weight specialization.",
+    ),
+    "48|Conv3d_Scaling_Tanh_Multiply_Sigmoid_Epilogue": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized Conv3d output: per-channel scale, tanh, per-channel multiply and sigmoid fused into one writer kernel for arbitrary input; no stage collapses.",
+    ),
+    "90|Conv3d_LeakyReLU_Sum_Clamp_GELU_Epilogue": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized Conv3d output: leaky_relu(0.2), per-channel add, clamp(-1,1) and gelu fused into one writer kernel for arbitrary input; no stage collapses.",
+    ),
+    "97|Matmul_BatchNorm_BiasAdd_Divide_Swish_Epilogue": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized Linear output: eval BatchNorm affine derived in-kernel via rsqrt, then bias/divide/Swish fused into one writer kernel for arbitrary input and arbitrary BN vectors; no host precompute, no alias.",
+    ),
+    "57|Conv2d_ReLU_HardSwish": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized Conv2d output: ReLU and exact HardSwish fused into one writer kernel for arbitrary input; 100-event retest is 3.350x.",
+    ),
+    "63|Gemm_ReLU_Divide": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized GEMM output: ReLU and divide fused into one writer kernel for arbitrary input; 100-event retest is 1.144x.",
+    ),
+    "70|Gemm_Sigmoid_Scaling_ResidualAdd": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized GEMM output: sigmoid, scale and residual add fused into one writer kernel for arbitrary input; 100-event retest is 2.035x.",
+    ),
+    "2|ConvTranspose2d_BiasAdd_Clamp_Scale_Clamp_Divide": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized ConvTranspose2d output: per-row bias, clamp, scale, clamp and divide fused into one writer kernel for arbitrary input; 100-event retest is 1.808x.",
+    ),
+    "9|Matmul_Subtract_Multiply_ReLU": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized Linear output: subtract, multiply and ReLU fused into one writer kernel for arbitrary input; 100-event retest is 1.731x.",
+    ),
+    "73|Conv2d_BatchNorm_Scaling": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized Conv2d output: training BatchNorm statistics and scale fused into one writer kernel for arbitrary input; 100-event retest is 7.201x.",
+    ),
+    "33|Gemm_Scale_BatchNorm": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized GEMM output: per-column scale, training BatchNorm statistics and normalization fused into one writer kernel for arbitrary input; 100-event retest is 7.419x.",
+    ),
+    "82|Conv2d_Tanh_Scaling_BiasAdd": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized Conv2d output: tanh, scale and per-row channel bias fused for arbitrary input; 100-event retest is 1.684x. MaxPool remains outside the measured boundary.",
+    ),
+    "21|Conv2d_Add_Scale_Sigmoid": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized Conv2d output: per-row bias, per-row scale and sigmoid fused for arbitrary input; 100-event retest is 1.174x. GroupNorm remains outside the boundary.",
+    ),
+    "46|Conv2d_Subtract_Tanh_Subtract": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized Conv2d output: subtract, native tanh and subtract fused for arbitrary input; 100-event retest is 1.394x. AvgPool remains outside the boundary.",
+    ),
+    "31|Conv2d_Min_Add_Multiply": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized Conv2d output: scalar min, per-row channel bias and scale fused for arbitrary input; 100-event retest is 2.334x.",
+    ),
+    "92|Conv2d_GroupNorm_Tanh_HardSwish_ResidualAdd": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized GroupNorm output plus arbitrary residual: tanh, HardSwish and residual add fused; tanh range proves the HardSwish clamp is identity. 100-event retest is 2.160x. GroupNorm and LogSumExp remain outside the boundary.",
+    ),
+    "16|ConvTranspose2d_Mish_Add_Hardtanh_Scale": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized Mish output: add(0.5), Hardtanh(-1,1) and scale(2) fused for arbitrary input; 100-event retest is 2.258x. Mish and ConvTranspose2d remain outside the boundary.",
+    ),
+    "74|ConvTranspose3d_LeakyReLU_Multiply_LeakyReLU_MaxPool": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized ConvTranspose3d output: LeakyReLU(0.2), arbitrary per-row multiplier and LeakyReLU(0.2) fused; 100-event retest is 1.535x. MaxPool remains outside the boundary.",
+    ),
+    "88|Gemm_GroupNorm_Swish_Multiply_Swish": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized GroupNorm output: Swish, arbitrary per-column multiply and Swish fused; 100-event retest is 5.261x. GroupNorm and GEMM remain outside the boundary.",
+    ),
+    "59|Matmul_Swish_Scaling": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized Linear output: Swish and scaling fused into one writer kernel for arbitrary input; 100-event retest is 2.026x.",
+    ),
+    "68|Matmul_Min_Subtract": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized Linear output: min(x,2) and subtract(2) fused for arbitrary input; 100-event retest is 1.452x.",
+    ),
+    "100|ConvTranspose3d_Clamp_Min_Divide": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized ConvTranspose3d output: clamp(min=-1) and divide(2) fused for arbitrary input; 100-event retest is 1.671x.",
+    ),
+    "26|ConvTranspose3d_Add_HardSwish": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized ConvTranspose3d output plus arbitrary add tensor: add and x*HardSwish(x) fused for arbitrary input; 100-event retest is 3.429x.",
+    ),
+    "53|Gemm_Scaling_Hardtanh_GELU": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized GEMM output: scaling and Hardtanh fused into one writer kernel for arbitrary input; GELU remains outside the measured boundary. 100-event retest is 2.035x.",
+    ),
+    "13|ConvTranspose3d_Mean_Add_Softmax_Tanh_Scaling": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 post-channel-Softmax materialized output: Tanh and scale fused; Conv/mean/bias/Softmax remain outside the measured boundary. 100-event retest is 1.254x.",
+    ),
+    "89|ConvTranspose3d_MaxPool_Softmax_Subtract_Swish_Max": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 post-channel-Softmax materialized output: channel subtract and Swish fused; Conv/MaxPool/Softmax/final channel max remain outside. 100-event retest is 2.581x.",
+    ),
+    "69|Conv2d_HardSwish_ReLU": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized Conv2d output: ReLU(HardSwish(x)) is mathematically equal to HardSwish(ReLU(x)); reuses the verified ReLU→HardSwish writer kernel. 100-event retest is 4.592x.",
+    ),
+    "62|Matmul_GroupNorm_LeakyReLU_Sum": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized GroupNorm output: LeakyReLU and residual self-add fused into one writer kernel for arbitrary input; GroupNorm/GEMM remain outside. 100-event retest is 1.282x.",
+    ),
+    "94|Gemm_BiasAdd_Hardtanh_Mish_GroupNorm": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized GEMM output: feature-axis bias add and HardTanh fused for arbitrary input; Mish/GroupNorm remain outside. 100-event retest is 1.778x.",
+    ),
+    "40|Matmul_Scaling_ResidualAdd": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized Linear output: scalar scale and residual self-add fused with separate original tile, preserving x*0.5+x semantics. 100-event retest is 1.553x.",
+    ),
+    "79|Conv3d_Multiply_InstanceNorm_Clamp_Multiply_Max": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized InstanceNorm output: clamp and per-channel multiply fused for arbitrary input; Conv/first multiply/InstanceNorm/final Max remain outside. 100-event retest is 1.780x.",
+    ),
+    "60|ConvTranspose3d_Swish_GroupNorm_HardSwish": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized ConvTranspose3d output: Swish fused into one writer kernel for arbitrary input; GroupNorm/HardSwish remain outside. 100-event retest is 1.541x.",
+    ),
+    "30|Gemm_GroupNorm_Hardtanh": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized GroupNorm output: HardTanh(-2,2) fused into one writer kernel for arbitrary input; GEMM/GroupNorm remain outside. 100-event retest is 1.422x.",
+    ),
+    "96|ConvTranspose3d_Multiply_Max_GlobalAvgPool_Clamp": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized post-pool output: clamp(0,1) fused into one writer kernel for arbitrary input; Conv/scaling/pooling remain outside. 100-event retest is 1.352x.",
+    ),
+    "5|ConvTranspose2d_Subtract_Tanh": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized ConvTranspose2d output: row-wise broadcast subtract and tanh fused for arbitrary input; ConvTranspose2d remains outside. 100-event retest is 1.373x.",
+    ),
+    "93|ConvTranspose2d_Add_Min_GELU_Multiply": (
+        "controlled_fused_epilogue",
+        "Controlled 4096x8192 materialized ConvTranspose2d output: add(0.5) and min(0) fused for arbitrary input; GELU/multiply remain outside. 100-event retest is 1.446x.",
+    ),
 }
 
 TIER_ORDER = [
+    "controlled_fused_epilogue",
+    "controlled_fused_reduction",
     "strong_semantic",
     "strong_l2_semantic",
     "semantic_alias",
@@ -170,8 +337,6 @@ TIER_ORDER = [
     "stable_activation",
     "stable_norm",
     "torch_slow_scan",
-    "controlled_fused_epilogue",
-    "controlled_fused_reduction",
     "small_shape_l2_fusion",
     "weak_fast",
     "variant_duplicate",
@@ -264,6 +429,27 @@ def main():
     trusted_rows = [row for row in rows if row["latest_trusted_source"]]
     trusted_keys = {row["key"] for row in trusted_rows}
     trusted_best = best_by_key(trusted_rows)
+    # Focused retests can intentionally be slower than an older specialized
+    # result; they still supersede it when they validate the same operator under
+    # the newer arbitrary-input evidence contract.
+    override_files = {
+        "l2_real_validated_epilogues_retest100_m4096_n8192.csv",
+        "l2_real_new_009_retest100_m4096_n8192.csv",
+        "l2_real_002_retest100_m4096_n8192.csv",
+        "l2_real_073_retest100_m4096_n8192.csv",
+        "l2_real_033_retest100_m4096_n8192.csv",
+        "l2_real_p0_retest100_m4096_n8192.csv",
+        "l2_real_p1_winners_retest100_m4096_n8192.csv",
+        "l2_real_next_retest100_m4096_n8192.csv",
+        "l2_real_p2_retest100_m4096_n8192.csv",
+        "l2_real_p3_retest100_m4096_n8192.csv",
+        "l2_real_p4_retest100_m4096_n8192.csv",
+        "l2_real_p5_retest100_m4096_n8192.csv",
+        "l2_real_p6_retest100_m4096_n8192.csv",
+    }
+    for row in trusted_rows:
+        if row["file"] in override_files:
+            trusted_best[row["key"]] = row
 
     latest_trusted = dict(historical)
     for key in trusted_keys:
@@ -282,7 +468,7 @@ def main():
     latest_fast_sorted = sorted(latest_fast, key=lambda r: (TIER_ORDER.index(r["tier"]) if r["tier"] in TIER_ORDER else 999, -r["speedup"]))
     with open(OUT_CSV, "w", newline="") as f:
         fieldnames = ["tier", "id", "operator", "speedup", "shape", "file", "latest_trusted_source", "tier_reason"]
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer = csv.DictWriter(f, fieldnames=fieldnames, lineterminator="\n")
         writer.writeheader()
         for row in latest_fast_sorted:
             writer.writerow({k: row[k] for k in fieldnames})

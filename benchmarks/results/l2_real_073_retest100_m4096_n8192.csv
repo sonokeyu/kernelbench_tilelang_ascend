@@ -1,0 +1,2 @@
+id,operator,shape,block_N,warmup,iters,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,tilelang_passed,variant
+73,Conv2d_BatchNorm_Scaling,"4096,8192",1024,20,100,28.01444580078125,3.890314636230469,13379.494275897741,7.201074571162687,True,arbitrary_input_real_fused_training_bn

@@ -1,0 +1,5 @@
+id,operator,stages,shape,variant,block_M,block_N,warmup,iters,torch_mean_ms,tilelang_mean_ms,compile_ms,speedup_mean_torch_over_tilelang,tilelang_passed,error
+7,Conv3d_ReLU_LeakyReLU_GELU_Sigmoid_BiasAdd_Epilogue,"relu,gelu,sigmoid,bias_add (leaky_relu range-eliminated)","4096,8192",tilelang_real_fused_epilogue,16,1024,20,100,0.972481766,0.363205185,14867.753269,2.677499678,True,
+48,Conv3d_Scaling_Tanh_Multiply_Sigmoid_Epilogue,"scale,tanh,multiply,sigmoid","4096,8192",tilelang_real_fused_epilogue,16,1024,20,100,0.791495819,0.372207184,12750.579093,2.126492592,True,
+90,Conv3d_LeakyReLU_Sum_Clamp_GELU_Epilogue,"leaky_relu,sum_add,clamp,gelu","4096,8192",tilelang_real_fused_epilogue,16,1024,20,100,1.128373032,0.407658806,13432.358624,2.767934889,True,
+97,Matmul_BatchNorm_BiasAdd_Divide_Swish_Epilogue,"bn_eval(rsqrt in kernel),bias_add,divide,swish","4096,8192",tilelang_real_fused_epilogue,16,1024,20,100,1.243253784,0.382428017,13003.491247,3.250948492,True,
